@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- DB에 접속할 정보 넣기 -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"
+			value="oracle.jdbc.OracleDriver" />
+		<property name="url"
+			value="jdbc:oracle:thin:@localhost:1521:xe" />
+		<property name="username" value="khpark" />
+		<property name="password" value="1111" />
+	</bean>
+
+	<!-- MyBatis와 oracle을 연결: config -->
+	<bean id="sqlSessionFactoryBean"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:config.xml" />
+	</bean>
+
+	<!-- mybatis : SqlSessionTemplate -->
+	<bean id="sqlSessionTemplate"
+		class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactoryBean" />
+	</bean>
+
+	<!-- spring 트랜잭션 매니져 호출, dao에서 사용하기 위해선 dao보다 먼저 생성되어야 하므로 dao 위에 위치시킨다. -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<!-- DAO -->
+	<bean id="dao" class="com.ict.service.DAO">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+		<property name="transactionManager" ref="transactionManager"></property>
+	</bean>
+	
+
+	<!-- 업로드 : class에 CMR 치면 나옴! -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="maxUploadSize" value="104857600" />
+	</bean>
+		
+	<!-- paging -->
+	<bean id="paging" class="com.ict.model.Paging"/>
+</beans>

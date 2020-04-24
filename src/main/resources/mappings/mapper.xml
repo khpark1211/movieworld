@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ict.service.mapper">
+
+	<!-- 회원가입 -->
+	<insert id="insertMember" parameterType="membervo">
+		insert into mv_member(mem_id, mem_pw, mem_name, mem_birth, mem_email, mem_phone, mem_gender, mem_point) Values(#{mem_id}, #{mem_pw}, #{mem_name}, #{mem_birth}, #{mem_email}, #{mem_phone}, #{mem_gender}, 500)
+	</insert>
+
+	<!-- id 중복체크 -->
+	<select id="idck" parameterType="membervo" resultType="membervo">
+		select * from mv_member where MEM_ID = #{MEM_ID}
+	</select>
+
+	<!-- 로그인 -->
+	<select id="login" parameterType="membervo" resultType="membervo">
+		select * from mv_member where mem_id=#{mem_id} and mem_pw=#{mem_pw}
+	</select>
+	
+	<!-- id찾기 -->
+	<select id="findid" parameterType="membervo" resultType="membervo">
+		select * from mv_member where mem_name=#{mem_name} and mem_email=#{mem_email}
+	</select>
+	
+	<select id="totalCount" resultType="int">
+		select count(*) from mv_board
+	</select>
+	
+	<select id="list" parameterType="Map" resultType="bvo">
+		select * from (
+			select rownum r_num, a.* from(
+				select * from mv_board order by groups desc, lev asc
+			) a
+		) where r_num between #{begin} and #{end}
+	</select>
+	
+	<!-- 글 삽입 -->
+	<insert id="insert_b" parameterType="bvo">
+		insert into mv_board values(mvboard_seq.nextval, #{mem_name}, #{title}, #{content}, 0, mvgroup_seq.nextval, 0, 0, sysdate, #{file_name})
+	</insert>
+	
+	<!-- hit업데이트 -->
+	<update id="hit" parameterType="String">
+		update mv_board set hit = hit+1 where idx = #{idx}
+	</update>
+	
+	<!-- 상세보기 -->
+	<select id="onelist" parameterType="String" resultType="bvo">
+		select * from mv_board where idx = #{idx}
+	</select>
+	
+	<!-- 삭제 -->
+	<delete id="delete" parameterType="String">
+		delete from mv_board where idx=#{idx}
+	</delete>
+	
+	<!-- 업데이트 -->
+	<update id="update" parameterType="bvo">
+		update mv_board set mem_name=#{mem_name}, title=#{title}, content=#{content}, file_name=#{file_name} where idx=#{idx}
+	</update>
+	
+	<select id="movielist" resultType="movievo">
+		select * from mv_movie where open_date <![CDATA[<]]> sysdate
+	</select>
+	
+	<select id="movielistsoon" parameterType="String" resultType="movievo">
+		select * from mv_movie where open_date <![CDATA[>]]> sysdate
+	</select>
+	
+	<insert id="insertmovie" parameterType="movievo">
+		insert into mv_movie values (mvmovie_seq.nextval, #{title}, #{running_time}, #{open_Date}, #{grade}, #{file_name}, #{story}, #{rate})
+	</insert>
+	
+	<!-- 상세보기 -->
+	<select id="onenowlist" parameterType="String" resultType="movievo">
+		select * from mv_movie where idx = #{idx} 
+	</select>
+	<select id="onenowlist2" parameterType="String" resultType="movievo">
+		select * from mv_movie where idx = #{idx} 
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
